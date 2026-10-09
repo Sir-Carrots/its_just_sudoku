@@ -1,4 +1,4 @@
-#include "game_loop.h"
+#include "backend.h"
 #include <stdint.h>
 
 INLINE void row_check(game_state *gs, uint_fast8_t row_num) {
@@ -99,8 +99,10 @@ INLINE void box_check (game_state *gs, uint_fast8_t box_num) {
 }
 
 game_state game_loop(game_state gs) {
-  for (uint_fast8_t i = 0; i<81; i++) {
-    gs.board[i]->state = NONE;
+  for (uint_fast8_t i = 0; i <  9; i++) {
+    for (uint_fast8_t h = 0; h < 9; h++) {
+      gs.board[h][i].state = NONE;
+    }
   }
   for (uint_fast8_t i = 0; i < 9; i++) {
     row_check(&gs, i);
