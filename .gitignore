@@ -1,0 +1,6 @@
+.git/
+*.o
+*.out
+.DS_Store
+.clangd
+/bin/
