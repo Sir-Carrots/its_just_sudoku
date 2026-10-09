@@ -26,40 +26,40 @@ package main
 // to Go. This C wrapper keeps the struct on the C side and updates it in place.
 game_state game_loop(game_state gs);
 static inline void sudoku_go_reset(game_state *gs) {
-    *gs = (game_state){0};
+	*gs = (game_state){0};
 }
 static inline void sudoku_go_set_num(game_state *gs, int row, int col, uint8_t n) {
-    gs->board[row][col].num = n;
-    gs->board[row][col].state = NONE;
+	gs->board[row][col].num = n;
+  gs->board[row][col].state = NONE;
 }
 static inline void sudoku_go_validate(game_state *gs) {
-    *gs = game_loop(*gs);
-    // The supplied game_loop.c may not calculate has_won itself.
-    gs->has_won = true;
-    for (int i = 0; i < 9; ++i) {
-        if (!gs->row_is_right[i] || !gs->column_is_right[i] || !gs->box_is_right[i]) {
-            gs->has_won = false;
-            break;
-        }
+	*gs = game_loop(*gs);
+  // The supplied game_loop.c may not calculate has_won itself.
+  gs->has_won = true;
+  for (int i = 0; i < 9; ++i) {
+    if (!gs->row_is_right[i] || !gs->column_is_right[i] || !gs->box_is_right[i]) {
+      gs->has_won = false;
+      break;
     }
+  }
 }
 static inline int sudoku_go_num(const game_state *gs, int row, int col) {
-    return (int)gs->board[row][col].num;
+  return (int)gs->board[row][col].num;
 }
 static inline int sudoku_go_cell_state(const game_state *gs, int row, int col) {
-    return (int)gs->board[row][col].state;
+  return (int)gs->board[row][col].state;
 }
 static inline int sudoku_go_row_right(const game_state *gs, int i) {
-    return gs->row_is_right[i] ? 1 : 0;
+  return gs->row_is_right[i] ? 1 : 0;
 }
 static inline int sudoku_go_column_right(const game_state *gs, int i) {
-    return gs->column_is_right[i] ? 1 : 0;
+  return gs->column_is_right[i] ? 1 : 0;
 }
 static inline int sudoku_go_box_right(const game_state *gs, int i) {
-    return gs->box_is_right[i] ? 1 : 0;
+  return gs->box_is_right[i] ? 1 : 0;
 }
 static inline int sudoku_go_has_won(const game_state *gs) {
-    return gs->has_won ? 1 : 0;
+  return gs->has_won ? 1 : 0;
 }
 */
 import "C"

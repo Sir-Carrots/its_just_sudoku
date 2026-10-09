@@ -41,3 +41,6 @@ typedef struct game_state {
   bool box_is_right[9];
   bool has_won;
 } game_state;
+
+
+game_state game_loop(game_state gs);
