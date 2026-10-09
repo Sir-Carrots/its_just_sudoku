@@ -97,3 +97,20 @@ INLINE void box_check (game_state *gs, uint_fast8_t box_num) {
 
   return;
 }
+
+game_state game_loop(game_state gs) {
+  for (uint_fast8_t i = 0; i<81; i++) {
+    gs.board[i]->state = NONE;
+  }
+  for (uint_fast8_t i = 0; i < 9; i++) {
+    row_check(&gs, i);
+  }
+  for (uint_fast8_t i = 0; i < 9; i++) {
+    column_check(&gs, i);
+  }
+  for (uint_fast8_t i = 0; i < 9; i++) {
+    box_check(&gs, i);
+  }
+  
+  return gs;
+}
