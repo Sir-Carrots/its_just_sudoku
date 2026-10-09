@@ -35,7 +35,8 @@ typedef struct cell {
 } cell;
 
 typedef struct game_state {
-  cell board[9][9];
+  uint_fast8_t nums[9][9];
+  cell_state state [9][9];
   bool row_is_right[9];
   bool column_is_right[9];
   bool box_is_right[9];

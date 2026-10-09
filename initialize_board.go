@@ -1,24 +1,7 @@
-// initialize_board.go generates a playable Sudoku puzzle in Go and uses the
-// C game_state/game_loop API declared by backend.h.
-//
-// Keep this file in the same directory as backend.h and game_loop.c.
-// Build the package (rather than this file alone) so cgo compiles game_loop.c:
-//
-//     go mod init sudoku   # only once, if the directory has no go.mod
-//     go build -o sudoku .
-//     ./sudoku -clues 30
-//
-// The executable is a newline-delimited JSON service for a Python UI.
-// It writes a state snapshot at startup and after every command. Commands:
-//     {"action":"set","row":0,"col":2,"num":7}
-//     {"action":"new","clues":32}
-//     {"action":"quit"}
-// Coordinates are zero-based; num=0 clears a player-entered cell.
-
 package main
 
 /*
-#cgo CFLAGS: -std=gnu2x
+#cgo CFLAGS: -std=c23
 #include <stdint.h>
 #include "backend.h"
 
