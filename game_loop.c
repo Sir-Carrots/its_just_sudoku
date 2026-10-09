@@ -1,12 +1,12 @@
 #include "backend.h"
 #include <string.h>
 
-INLINE void row_check(game_state *gs, uint_fast8_t row_num) {
+INLINE void row_check(game_state *gs, uint8_t row_num) {
   uint16_t seen_posns = 0;
   uint16_t duplicate_posns = 0;
 
-  for (uint_fast8_t i = 0; i < 9; i++) {
-    uint_fast8_t num = gs->nums[row_num][i];
+  for (uint8_t i = 0; i < 9; i++) {
+    uint8_t num = gs->nums[row_num][i];
     uint16_t bit_posn = (uint16_t)(1u << num);
     if (seen_posns & bit_posn) {
       duplicate_posns |= bit_posn;
@@ -14,8 +14,8 @@ INLINE void row_check(game_state *gs, uint_fast8_t row_num) {
     seen_posns |= bit_posn;
   }
 
-  for (uint_fast8_t i = 0; i < 9; i++) {
-    uint_fast8_t num = gs->nums[row_num][i];
+  for (uint8_t i = 0; i < 9; i++) {
+    uint8_t num = gs->nums[row_num][i];
     uint16_t bit_posn = (uint16_t)(1u << num);
     if (duplicate_posns & bit_posn){
       gs->state[row_num][i] = INCORRECT;
@@ -31,12 +31,12 @@ INLINE void row_check(game_state *gs, uint_fast8_t row_num) {
   return;
 }
 
-INLINE void column_check (game_state *gs, uint_fast8_t column_num) {
+INLINE void column_check (game_state *gs, uint8_t column_num) {
   uint16_t seen_posns = 0;
   uint16_t duplicate_posns = 0;
 
-  for (uint_fast8_t i = 0; i < 9; i++) {
-    uint_fast8_t num = gs->nums[i][column_num];
+  for (uint8_t i = 0; i < 9; i++) {
+    uint8_t num = gs->nums[i][column_num];
     if (num == 0) {
       continue;
     }
@@ -47,8 +47,8 @@ INLINE void column_check (game_state *gs, uint_fast8_t column_num) {
     seen_posns |= bit_posn;
   }
 
-  for (uint_fast8_t i = 0; i < 9; i++) {
-    uint_fast8_t num = gs->nums[i][column_num];
+  for (uint8_t i = 0; i < 9; i++) {
+    uint8_t num = gs->nums[i][column_num];
     uint16_t bit_posn = (uint16_t)(1u << num);
     if (duplicate_posns & bit_posn) {
       gs->state[i][column_num] = INCORRECT;
@@ -64,14 +64,14 @@ INLINE void column_check (game_state *gs, uint_fast8_t column_num) {
   return;
 }
 
-INLINE void box_check (game_state *gs, uint_fast8_t box_num) {
+INLINE void box_check (game_state *gs, uint8_t box_num) {
   uint16_t seen_posns = 0;
   uint16_t duplicate_posns = 0;
 
-  for (uint_fast8_t i = 0; i < 9; i++) {
-    uint_fast8_t row = (box_num / 3) * 3 + (i / 3);
-    uint_fast8_t col = (box_num % 3) * 3 + (i % 3);
-    uint_fast8_t num = gs->nums[row][col];
+  for (uint8_t i = 0; i < 9; i++) {
+    uint8_t row = (box_num / 3) * 3 + (i / 3);
+    uint8_t col = (box_num % 3) * 3 + (i % 3);
+    uint8_t num = gs->nums[row][col];
     uint16_t bit_posn = (uint16_t)(1u << num);
     if(seen_posns & bit_posn) {
       duplicate_posns |= bit_posn;
@@ -79,10 +79,10 @@ INLINE void box_check (game_state *gs, uint_fast8_t box_num) {
     seen_posns |= bit_posn;
   }
 
-  for (uint_fast8_t i = 0; i < 9; i++) {
-    uint_fast8_t row = (box_num / 3) * 3 + (i / 3);
-    uint_fast8_t col = (box_num % 3) * 3 + (i % 3);
-    uint_fast8_t num = gs->nums[row][col];
+  for (uint8_t i = 0; i < 9; i++) {
+    uint8_t row = (box_num / 3) * 3 + (i / 3);
+    uint8_t col = (box_num % 3) * 3 + (i % 3);
+    uint8_t num = gs->nums[row][col];
     uint16_t bit_posn = (uint16_t)(1u << num);
     if (duplicate_posns & bit_posn) {
       gs->state[row][col] = INCORRECT;
@@ -99,14 +99,14 @@ INLINE void box_check (game_state *gs, uint_fast8_t box_num) {
 }
 
 game_state game_loop(game_state gs) {
-  memset(gs.state, 0, 81*sizeof(uint_fast8_t));
-  for (uint_fast8_t i = 0; i < 9; i++) {
+  memset(gs.state, 0, 81*sizeof(uint8_t));
+  for (uint8_t i = 0; i < 9; i++) {
     row_check(&gs, i);
   }
-  for (uint_fast8_t i = 0; i < 9; i++) {
+  for (uint8_t i = 0; i < 9; i++) {
     column_check(&gs, i);
   }
-  for (uint_fast8_t i = 0; i < 9; i++) {
+  for (uint8_t i = 0; i < 9; i++) {
     box_check(&gs, i);
   }
   

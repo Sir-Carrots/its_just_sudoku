@@ -24,18 +24,18 @@
 #endif
 #endif
 
-typedef enum cell_state : uint_fast8_t {
+typedef enum cell_state : uint8_t {
   NONE,
   INCORRECT
 } cell_state;
 
 typedef struct cell {
-  uint_fast8_t num;
+  uint8_t num;
   cell_state state;
 } cell;
 
 typedef struct game_state {
-  uint_fast8_t nums[9][9];
+  uint8_t nums[9][9];
   cell_state state [9][9];
   bool row_is_right[9];
   bool column_is_right[9];
