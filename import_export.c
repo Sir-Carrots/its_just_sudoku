@@ -34,6 +34,7 @@ int read_from_csv(game_state *gs, const char abs_filepath[]) {
 
   for (uint8_t row = 0; row < 9; row++) {
     if (fgets(line, sizeof(line), csv) == NULL) {
+      memset(gs->nums, 0, 81*sizeof(uint8_t));
       fclose(csv);
       return -1;
     }
@@ -41,6 +42,7 @@ int read_from_csv(game_state *gs, const char abs_filepath[]) {
 
     for (uint8_t col = 0; col < 9; col++) {
       if (token == NULL) {
+        memset(gs->nums, 0, 81*sizeof(uint8_t));
         fclose(csv);
         return -1;
       }
