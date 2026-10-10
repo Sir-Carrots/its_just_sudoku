@@ -18,8 +18,7 @@ int write_to_csv(game_state *gs, const char abs_filepath[]) {
     }
     fprintf(csv, "%w8u\n", gs->nums[row][8]);
   }
-  fclose(csv);
-  return 0;
+  return fclose(csv) == EOF ? -1 : 0;
 }
 
 int read_from_csv(game_state *gs, const char abs_filepath[]) {
@@ -51,6 +50,7 @@ int read_from_csv(game_state *gs, const char abs_filepath[]) {
   }
 
   if (ferror(csv)) {
+    memset(gs->nums, 0, 81*sizeof(uint8_t));
     fclose(csv);
     return -1;
   }
