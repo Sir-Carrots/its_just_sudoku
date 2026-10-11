@@ -46,7 +46,13 @@ int read_from_csv(game_state *gs, const char abs_filepath[]) {
         fclose(csv);
         return -1;
       }
-      gs->nums[row][col] = (uint8_t)strtoul(token, NULL, 10);
+      uint8_t candidate_num = (uint8_t)strtoul(token, NULL, 10);
+      if (candidate_num > 9) {
+        memset(gs->nums, 0, 81*sizeof(uint8_t));
+        fclose(csv);
+        return -1;
+      }
+      gs->nums[row][col] = candidate_num;
       token = strtok(NULL, ",\n\r");
     }
   }
