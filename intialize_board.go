@@ -200,7 +200,7 @@ func makePuzzle(board *grid, rng *rand.Rand) int {
 // export generate_puzzle
 func generate_puzzle(boardPosn *C.uint8_t) C.int {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	var board *grid = *grid(unsafe.Pointer(boardPosn))
+	board := (*grid)(unsafe.Pointer(boardPosn))
 	makeSolvedBoard(board, rng)
 	clues := makePuzzle(board, rng)
 	return C.int(clues)
