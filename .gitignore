@@ -4,3 +4,5 @@
 .DS_Store
 .clangd
 /bin/
+*perf.data
+/test_boards/

@@ -45,3 +45,5 @@ typedef struct game_state {
 
 
 game_state game_loop(game_state gs);
+int write_to_csv(game_state *gs, const char abs_filepath[]);
+int read_from_csv(game_state *gs, const char abs_filepath[]);
