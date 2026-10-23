@@ -1,4 +1,5 @@
 #include "backend.h"
+#include <stdint.h>
 #include <string.h>
 
 INLINE void row_check(game_state *gs, uint8_t row_num) {
@@ -109,6 +110,8 @@ game_state game_loop(game_state gs) {
   for (uint8_t i = 0; i < 9; i++) {
     box_check(&gs, i);
   }
+  uint8_t control[27] = {0};
+  gs.has_won = memcmp(&gs.row_is_right, control, sizeof(bool)*27);
   
   return gs;
 }
