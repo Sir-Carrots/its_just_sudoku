@@ -12,7 +12,7 @@ typedef struct pack_game_state {
 int main(void) {
   game_state test[3] = {0};
   game_state unsolved_puzzle = {0};
-  if (read_from_csv(&unsolved_puzzle, "/home/atharvm/Projects/its_just_sudoku/test_boards/valid_puzzle.csv") != 0) {
+  if (read_from_csv(&unsolved_puzzle, "./testing/test_boards/valid_puzzle.csv") != 0) {
     perror("failed to read file");
     return -1;
   }
@@ -20,7 +20,7 @@ int main(void) {
   test[0] = output1;
 
   game_state solved_puzzle = {0};
-  if (read_from_csv(&solved_puzzle, "/home/atharvm/Projects/its_just_sudoku/test_boards/solved_board.csv") != 0) {
+  if (read_from_csv(&solved_puzzle, "./testing/test_boards/solved_board.csv") != 0) {
     perror("failed to read file");
     return -1;
   }
@@ -28,7 +28,7 @@ int main(void) {
   test[1] = output2;
 
   game_state conflict_puzzle = {0};
-  if (read_from_csv(&conflict_puzzle, "/home/atharvm/Projects/its_just_sudoku/test_boards/conflict_board.csv") != 0) {
+  if (read_from_csv(&conflict_puzzle, "./testing/test_boards/conflict_board.csv") != 0) {
     perror("failed to read file");
     return -1;
   }
