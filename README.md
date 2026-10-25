@@ -12,7 +12,7 @@ It is literally just sudoku. So, the things work talking about are:
 - The go initializer cannot make all possible solvable sudoku boards, because it uses a presolved sudoku pattern to make a puzzle, instead of starting from scratch and using a recursive backtracking solver. Oops
 - The game has vim-motions. Use them (I promise you it's way better)
 - Yes, there are two frontends here. When I was trying to learn clay + raylib, I just picked this because there was only  fruntend to write
-- for now this is linux only, though there are fragments of more portable code here and there. If I feel up to it, windows and macos will be supported
+- For now this is linux only, though there are fragments of more portable code here and there. If I feel up to it, windows and macos will be supported
 
 
 ## Usage
@@ -21,7 +21,7 @@ It is literally just sudoku. So, the things work talking about are:
 
 The commands below target Linux. You need:
 
-- GCC with C23 support, including fixed-underlying-type enums (GCC 15 works).
+- GCC with C23 support, including fixed-underlying-type enums (GCC 15 works) (we are a gcc household, usually).
 - Go 1.22 or newer, with CGo enabled.
 - A graphical desktop session.
 - For the Python frontend: Python 3 with Tkinter.
@@ -31,13 +31,13 @@ You can use either frontend independently. No pip packages, virtual environment,
 
 ```sh
 # Common dependencies
-sudo pacman -Syu --needed gcc go
+sudo pacman -Syu gcc go
 
 # Python frontend
-sudo pacman -S --needed python tk
+sudo pacman -S python tk
 
 # Native Clay + raylib frontend
-sudo pacman -S --needed raylib zenity pkgconf curl
+sudo pacman -S raylib zenity pkgconf curl
 ```
 
 For the Python frontend, use the system Python so it picks up the Tk installation from pacman. The native frontend does not require Python.
@@ -126,8 +126,6 @@ Movement wraps at the board edges. Enable vim keys using the checkbox in the too
 
 - Terracotta cells indicate conflicts.
 - Sage-green cells belong to a completed row, column, or 3×3 box; conflicts take priority over completion highlighting.
-- Checkmarks indicate completed rows and columns. Completed boxes are listed below the board, numbered 1–9 from left to right, top to bottom.
-- **Solved!** appears when the C backend reports that the whole board is complete.
 
 ### Save and load
 
@@ -145,7 +143,7 @@ gcc -std=c23 -O2 -Wall -Wextra bench.c game_loop.c -o bin/bench_game_loop
 ./bin/bench_game_loop 3000000 conflict
 ```
 
-The first argument is the iteration count; the second selects the nonconflicting or conflicting board. The reported `ns_per_call` measures repeated validation of one hot-in-cache board, not CSV operations or frontend latency. Build without LTO and repeat runs to compare timings; results depend on your CPU and compiler.
+The first argument is the iteration count; the second selects the nonconflicting or conflicting board. The reported `ns_per_call` measures repeated validation of one hot-in-cache board, not CSV operations or frontend latency. Build without LTO and repeat runs to compare timings; results depend on your CPU and compiler. On my machine I get somewhere around 400~500ns
 
 
 ## Releases
