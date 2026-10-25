@@ -152,6 +152,9 @@ func countSolutions(board *grid, limit int) int {
 	for row := range size {
 		for col := range size {
 			num := board[row][col]
+			if num == 0 {
+				continue
+			}
 			bitPosn := uint16(1) << num
 			box := (row/3)*3 + col/3
 			if occupiedInRow[row]&bitPosn != 0 || occupiedInCol[col]&bitPosn != 0 || occupiedInBox[box]&bitPosn != 0 {
@@ -197,7 +200,7 @@ func makePuzzle(board *grid, rng *rand.Rand) int {
 	return clues
 }
 
-// export generate_puzzle
+//export generate_puzzle
 func generate_puzzle(boardPosn *C.uint8_t) C.int {
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
 	board := (*grid)(unsafe.Pointer(boardPosn))

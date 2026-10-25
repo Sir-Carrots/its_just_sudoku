@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 200809L
 #include "backend.h"
 
+#include <errno.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -56,7 +57,7 @@ static uint64_t checksum_state(const game_state *gs) {
 
 static double elapsed_seconds(struct timespec start, struct timespec end) {
   return (double)(end.tv_sec - start.tv_sec)
-       + (double)(end.tv_nsec - start.tv_nsec) / 1.0e9;
+    + (double)(end.tv_nsec - start.tv_nsec) / 1.0e9;
 }
 
 static void usage(const char *program) {
@@ -69,9 +70,11 @@ int main(int argc, char **argv) {
 
   if (argc >= 2) {
     char *end = NULL;
+    errno = 0;
     unsigned long long parsed = strtoull(argv[1], &end, 10);
 
-    if (!argv[1][0] || !end || *end != '\0' || parsed == 0) {
+    if (argv[1][0] < '0' || argv[1][0] > '9' || *end != '\0' ||
+      errno == ERANGE || parsed == 0 || parsed > UINT64_MAX) {
       usage(argv[0]);
       return 2;
     }
@@ -98,12 +101,12 @@ int main(int argc, char **argv) {
   game_state gs = make_state(conflicting_board);
 
   const uint64_t warmup =
-      iterations < UINT64_C(100000)
-          ? iterations / 10 + 1
-          : UINT64_C(100000);
+    iterations < UINT64_C(100000)
+      ? iterations / 10 + 1
+      : UINT64_C(100000);
 
   for (uint64_t i = 0; i < warmup; ++i) {
-    gs = *game_loop(&gs);
+    game_loop(&gs);
   }
 
   struct timespec start, end;
@@ -114,7 +117,7 @@ int main(int argc, char **argv) {
   }
 
   for (uint64_t i = 0; i < iterations; ++i) {
-    gs = *game_loop(&gs);
+    game_loop(&gs);
   }
 
   if (clock_gettime(CLOCK_THREAD_CPUTIME_ID, &end) != 0) {
@@ -127,14 +130,14 @@ int main(int argc, char **argv) {
   const uint64_t checksum = checksum_state(&gs);
 
   printf("RESULT layout=%s mode=%s iterations=%" PRIu64
-         " ns_per_call=%.3f checksum=0x%016" PRIx64
-         " sizeof_game_state=%zu\n",
-         LAYOUT_NAME,
-         conflicting_board ? "conflict" : "valid",
-         iterations,
-         ns_per_call,
-         checksum,
-         sizeof(game_state));
+    " ns_per_call=%.3f checksum=0x%016" PRIx64
+    " sizeof_game_state=%zu\n",
+    LAYOUT_NAME,
+    conflicting_board ? "conflict" : "valid",
+    iterations,
+    ns_per_call,
+    checksum,
+    sizeof(game_state));
 
   return 0;
 }
