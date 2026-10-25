@@ -292,11 +292,26 @@ int main(void) {
 	Clay_Raylib_Initialize(WINDOW_WIDTH, WINDOW_HEIGHT, "Just Sudoku", FLAG_VSYNC_HINT | FLAG_MSAA_4X_HINT);
 	SetExitKey(KEY_NULL);
 	SetTargetFPS(60);
-	Font fonts[] = {GetFontDefault()};
+	Font font = GetFontDefault();
+	FILE *match = popen("fc-match -f '%{file}\\n' sans 2>/dev/null", "r");
+	if (match) {
+		char path[4096];
+		bool found = fgets(path, sizeof path, match) != NULL;
+		int result = pclose(match);
+		if (found && result == 0) {
+			path[strcspn(path, "\r\n")] = '\0';
+			font = LoadFontEx(path, 48, NULL, 0);
+		}
+	}
+	bool system_font = font.texture.id != GetFontDefault().texture.id;
+	if (system_font) SetTextureFilter(font.texture, TEXTURE_FILTER_BILINEAR);
+	else TraceLog(LOG_WARNING, "System font unavailable; install fontconfig and a TrueType font.");
+	Font fonts[] = {font};
 	size_t capacity = Clay_MinMemorySize();
 	void *memory = malloc(capacity);
 	if (!memory) {
 		fprintf(stderr, "Could not allocate Clay's layout arena.\n");
+		if (system_font) UnloadFont(font);
 		Clay_Raylib_Close();
 		return 1;
 	}
@@ -319,6 +334,7 @@ int main(void) {
 		if (app.busy) finish_generation(&app);
 	}
 	UnloadShader(overlayShader);
+	if (system_font) UnloadFont(font);
 	Clay_Raylib_Close();
 	free(memory);
 	return 0;

@@ -12,6 +12,7 @@ It is literally just sudoku. So, the things work talking about are:
 - The go initializer cannot make all possible solvable sudoku boards, because it uses a presolved sudoku pattern to make a puzzle, instead of starting from scratch and using a recursive backtracking solver. Oops
 - The game has vim-motions. Use them (I promise you it's way better)
 - Yes, there are two frontends here. When I was trying to learn clay + raylib, I just picked this because there was only  fruntend to write
+- for now this is linux only, though there are fragments of more portable code here and there. If I feel up to it, windows and macos will be supported
 
 
 ## Usage
