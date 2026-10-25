@@ -2,8 +2,6 @@
 import ctypes as C
 import os
 from pathlib import Path
-import queue
-import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
@@ -58,7 +56,6 @@ def main():
 			self.givens = set()
 			self.selected = (0, 0)
 			self.busy = False
-			self.results = queue.Queue()
 			root.title("Just Sudoku")
 			root.resizable(False, False)
 			root.configure(bg=self.PAPER)
@@ -89,7 +86,6 @@ def main():
 				font=("TkDefaultFont", 11, "bold")).pack(pady=(2, 8))
 			self.draw()
 			self.canvas.focus_set()
-			root.after(100, self.poll)
 			if generate is not None:
 				root.after(0, self.new)
 
@@ -175,35 +171,22 @@ def main():
 			for button in self.buttons:
 				button.config(state="disabled")
 			self.draw()
-
-			def worker():
-				try:
-					board = GameState()
-					generate(C.cast(board.nums, C.POINTER(C.c_uint8)))
-					native.game_loop(C.byref(board))
-					self.results.put((board, None))
-				except Exception as error:
-					self.results.put((None, str(error)))
-
-			threading.Thread(target=worker, daemon=True).start()
-
-		def poll(self):
+			# Present "Generating…" before blocking on the native initializer.
+			self.root.update_idletasks()
 			try:
-				board, error = self.results.get_nowait()
-			except queue.Empty:
-				pass
-			else:
+				board = GameState()
+				generate(C.cast(board.nums, C.POINTER(C.c_uint8)))
+				native.game_loop(C.byref(board))
+				self.board = board
+				self.givens = {(r, c) for r in range(9) for c in range(9) if board.nums[r][c]}
+			except Exception as error:
+				messagebox.showerror("Generation failed", str(error))
+			finally:
 				self.busy = False
 				for button in self.buttons:
 					button.config(state="normal")
-				if error:
-					messagebox.showerror("Generation failed", error)
-				else:
-					self.board = board
-					self.givens = {(r, c) for r in range(9) for c in range(9) if board.nums[r][c]}
 				self.draw()
 				self.canvas.focus_set()
-			self.root.after(100, self.poll)
 
 		def load(self):
 			path = filedialog.askopenfilename(filetypes=[("CSV boards", "*.csv"), ("All files", "*")])

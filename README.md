@@ -11,6 +11,7 @@ It is literally just sudoku. So, the things work talking about are:
   - Again, this is pretty vague, because I haven't looked into it that much, but you could get it down to ~50 ns (try looking at the tdoku repo https://github.com/t-dillon/tdoku. The solver is very cool)
 - The go initializer cannot make all possible solvable sudoku boards, because it uses a presolved sudoku pattern to make a puzzle, instead of starting from scratch and using a recursive backtracking solver. Oops
 - The game has vim-motions. Use them (I promise you it's way better)
+- Yes, there are two frontends here. When I was trying to learn clay + raylib, I just picked this because there was only  fruntend to write
 
 
 ## Usage
@@ -21,15 +22,24 @@ The commands below target Linux. You need:
 
 - GCC with C23 support, including fixed-underlying-type enums (GCC 15 works).
 - Go 1.22 or newer, with CGo enabled.
-- Python 3 with Tkinter and a graphical desktop session.
+- A graphical desktop session.
+- For the Python frontend: Python 3 with Tkinter.
+- For the native C frontend: raylib 5.5 or newer, Clay and its matching raylib renderer, and Zenity for file dialogs.
 
-No pip packages, virtual environment, or Python build step are needed. On Arch/CachyOS, the dependencies can be installed with:
+You can use either frontend independently. No pip packages, virtual environment, or Python build step are needed. On Arch/CachyOS, install the common dependencies and the packages for your chosen frontend:
 
 ```sh
-sudo pacman -Syu --needed gcc go python tk
+# Common dependencies
+sudo pacman -Syu --needed gcc go
+
+# Python frontend
+sudo pacman -S --needed python tk
+
+# Native Clay + raylib frontend
+sudo pacman -S --needed raylib zenity pkgconf curl
 ```
 
-Use the system Python so it picks up the Tk installation from pacman.
+For the Python frontend, use the system Python so it picks up the Tk installation from pacman. The native frontend does not require Python.
 
 ### Build and run
 
@@ -39,16 +49,18 @@ Run these commands from the root of this repository. `bin/` is a local directory
 mkdir -p bin
 ```
 
+First, build the Go initializer, which both frontends use. Pass the Go filename explicitly so Go does not try to build the unrelated C programs in this directory:
+
+```sh
+CGO_ENABLED=1 go build -buildmode=c-shared -o bin/libgenerator.so intialize_board.go
+```
+
+#### Python / Tkinter frontend
+
 Build the C validator and CSV functions into a shared library:
 
 ```sh
 gcc -std=c23 -O2 -Wall -Wextra -fPIC -shared game_loop.c import_export.c -o bin/libsudoku.so
-```
-
-Build the Go initializer into a separate shared library. Pass the Go filename explicitly so Go does not try to build the unrelated C programs in this directory:
-
-```sh
-CGO_ENABLED=1 go build -buildmode=c-shared -o bin/libgenerator.so intialize_board.go
 ```
 
 Launch the frontend:
@@ -60,6 +72,46 @@ python3 frontend.py
 On Arch/CachyOS, use `/usr/bin/python frontend.py` if your shell's Python points to a virtual environment or another installation. You can check Tkinter with `/usr/bin/python -m tkinter`; it should open a small demo window.
 
 After the first build, just run the Python command to play. Rebuild the relevant shared library whenever you change its C or Go source. Python-only changes do not require rebuilding either library.
+
+#### Native C / Clay + raylib frontend
+
+Download Clay and its raylib renderer at the matching revision below. These are build dependencies, not a separate program to install. Keep them at the same revision because Clay's API can change:
+
+```sh
+mkdir -p bin/native-deps
+CLAY_REV=e6cc36941ab2af5d81107617039d6f527a1c660b
+
+curl -fL "https://raw.githubusercontent.com/nicbarker/clay/$CLAY_REV/clay.h" \
+  -o bin/native-deps/clay.h
+
+curl -fL "https://raw.githubusercontent.com/nicbarker/clay/$CLAY_REV/renderers/raylib/clay_renderer_raylib.c" \
+  -o bin/native-deps/clay_renderer_raylib.c
+
+curl -fL "https://raw.githubusercontent.com/nicbarker/clay/$CLAY_REV/LICENSE.md" \
+  -o bin/native-deps/CLAY-LICENSE.md
+```
+
+Build the executable. This compiles the C backend directly into the frontend; `bin/libsudoku.so` is only needed by the Python version:
+
+```sh
+gcc -std=c23 -O2 frontend.c game_loop.c import_export.c \
+  -Ibin/native-deps \
+  $(pkg-config --cflags --libs raylib) \
+  -Lbin -lgenerator -Wl,-rpath,'$ORIGIN' \
+  -lm -o bin/sudoku
+```
+
+Run it:
+
+```sh
+./bin/sudoku
+```
+
+Keep `libgenerator.so` beside the executable in `bin/`; the `$ORIGIN` linker setting lets the executable find it there. Zenity supplies the load/save dialogs. The downloaded dependencies live in the Git-ignored `bin/` directory, so download them again on a fresh clone. Rebuild the executable after changing its C source, or rebuild `libgenerator.so` after changing Go source.
+
+If Neovim's clangd cannot find Clay, make sure `.clangd` includes `-Ibin/native-deps` under `CompileFlags.Add`, then run `:LspRestart`. The actual compiler also needs that include flag, as shown above.
+
+Both frontends display a generating message before calling the Go initializer synchronously; input and rendering pause until generation finishes. Neither frontend creates a worker thread for generation.
 
 ### Playing
 
