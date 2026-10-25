@@ -1,8 +1,7 @@
 #include "backend.h"
-#include <stdint.h>
 #include <string.h>
 
-INLINE void row_check(game_state *gs, uint8_t row_num) {
+INLINE bool row_check(game_state *gs, uint8_t row_num) {
   uint16_t seen_posns = 0;
   uint16_t duplicate_posns = 0;
 
@@ -26,13 +25,10 @@ INLINE void row_check(game_state *gs, uint8_t row_num) {
     }
   }
 
-  gs->row_is_right[row_num] = (seen_posns == 0b0000001111111110 
-    && duplicate_posns == 0b0000000000000000); //this is a fully solved row's state
-
-  return;
+  return (gs->row_is_right[row_num] = (seen_posns == 0b0000001111111110 && duplicate_posns == 0b0000000000000000)); //this is a fully solved row's state
 }
 
-INLINE void column_check (game_state *gs, uint8_t column_num) {
+INLINE bool column_check (game_state *gs, uint8_t column_num) {
   uint16_t seen_posns = 0;
   uint16_t duplicate_posns = 0;
 
@@ -59,13 +55,10 @@ INLINE void column_check (game_state *gs, uint8_t column_num) {
     }
   }
 
-  gs->column_is_right[column_num] = (seen_posns == 0b0000001111111110 
-    && duplicate_posns == 0b0000000000000000);
-
-  return;
+  return (gs->column_is_right[column_num] = (seen_posns == 0b0000001111111110 && duplicate_posns == 0b0000000000000000));
 }
 
-INLINE void box_check (game_state *gs, uint8_t box_num) {
+INLINE bool box_check (game_state *gs, uint8_t box_num) {
   uint16_t seen_posns = 0;
   uint16_t duplicate_posns = 0;
 
@@ -93,29 +86,25 @@ INLINE void box_check (game_state *gs, uint8_t box_num) {
     }
   }
 
-  gs->box_is_right[box_num] = (seen_posns == 0b0000001111111110 
-    && duplicate_posns == 0b0000000000000000);
-
-  return;
+  return (gs->box_is_right[box_num] = (seen_posns == 0b0000001111111110 
+    && duplicate_posns == 0b0000000000000000));
 }
 
 game_state game_loop(game_state gs) {
   memset(gs.state, 0, 81*sizeof(uint8_t));
+  uint8_t control = 0;
   for (uint8_t i = 0; i < 9; i++) {
-    row_check(&gs, i);
+    control += row_check(&gs, i);
   }
   for (uint8_t i = 0; i < 9; i++) {
-    column_check(&gs, i);
+    control += column_check(&gs, i);
   }
   for (uint8_t i = 0; i < 9; i++) {
-    box_check(&gs, i);
+    control += box_check(&gs, i);
   }
-  bool control[27] = {
-    1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1, 1
-  };
-  gs.has_won = !memcmp(&gs.row_is_right, control, sizeof(bool)*27);
+  if (control == 27) {
+    gs.has_won = true;
+  }
   
   return gs;
 }
