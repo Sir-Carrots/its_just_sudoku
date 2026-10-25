@@ -25,7 +25,8 @@ INLINE bool row_check(game_state *gs, uint8_t row_num) {
     }
   }
 
-  return (gs->row_is_right[row_num] = (seen_posns == 0b0000001111111110 && duplicate_posns == 0b0000000000000000)); //this is a fully solved row's state
+  return (gs->row_is_right[row_num] = (seen_posns == 0b0000001111111110 
+  && duplicate_posns == 0b0000000000000000)); //this is a fully solved row's state
 }
 
 INLINE bool column_check (game_state *gs, uint8_t column_num) {
@@ -55,7 +56,8 @@ INLINE bool column_check (game_state *gs, uint8_t column_num) {
     }
   }
 
-  return (gs->column_is_right[column_num] = (seen_posns == 0b0000001111111110 && duplicate_posns == 0b0000000000000000));
+  return (gs->column_is_right[column_num] = (seen_posns == 0b0000001111111110 
+  && duplicate_posns == 0b0000000000000000));
 }
 
 INLINE bool box_check (game_state *gs, uint8_t box_num) {
@@ -90,21 +92,19 @@ INLINE bool box_check (game_state *gs, uint8_t box_num) {
     && duplicate_posns == 0b0000000000000000));
 }
 
-game_state game_loop(game_state gs) {
-  memset(gs.state, 0, 81*sizeof(uint8_t));
+game_state* game_loop(game_state *gs) {
+  memset(gs->state, 0, 81*sizeof(uint8_t));
   uint8_t control = 0;
   for (uint8_t i = 0; i < 9; i++) {
-    control += row_check(&gs, i);
+    control += row_check(gs, i);
   }
   for (uint8_t i = 0; i < 9; i++) {
-    control += column_check(&gs, i);
+    control += column_check(gs, i);
   }
   for (uint8_t i = 0; i < 9; i++) {
-    control += box_check(&gs, i);
+    control += box_check(gs, i);
   }
-  if (control == 27) {
-    gs.has_won = true;
-  }
+  gs->has_won = (control == 27);
   
   return gs;
 }

@@ -103,7 +103,7 @@ int main(int argc, char **argv) {
           : UINT64_C(100000);
 
   for (uint64_t i = 0; i < warmup; ++i) {
-    gs = game_loop(gs);
+    gs = *game_loop(&gs);
   }
 
   struct timespec start, end;
@@ -114,7 +114,7 @@ int main(int argc, char **argv) {
   }
 
   for (uint64_t i = 0; i < iterations; ++i) {
-    gs = game_loop(gs);
+    gs = *game_loop(&gs);
   }
 
   if (clock_gettime(CLOCK_THREAD_CPUTIME_ID, &end) != 0) {
