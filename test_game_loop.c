@@ -51,7 +51,7 @@ int main(void) {
     for (int j = 0; j < 9; j++) {
       printf("%b ", test[i].box_is_right[j]);
     }
-    printf("%b\n\n\n", test[i].has_won);
+    printf("\n%b\n\n\n", test[i].has_won);
   }
   
   return (int)buff_size;

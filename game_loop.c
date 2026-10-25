@@ -104,15 +104,18 @@ game_state game_loop(game_state gs) {
   for (uint8_t i = 0; i < 9; i++) {
     row_check(&gs, i);
   }
-  gs.row_is_right[2] = true;
   for (uint8_t i = 0; i < 9; i++) {
     column_check(&gs, i);
   }
   for (uint8_t i = 0; i < 9; i++) {
     box_check(&gs, i);
   }
-  uint8_t control[27] = {[0 ... 26] = 1};
-  gs.has_won = memcmp(&gs.row_is_right, control, sizeof(bool)*27);
+bool control[27] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+  gs.has_won = !memcmp(&gs.row_is_right, control, sizeof(bool)*27);
   
   return gs;
 }
