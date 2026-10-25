@@ -107,11 +107,7 @@ Run it:
 ./bin/sudoku
 ```
 
-Keep `libgenerator.so` beside the executable in `bin/`; the `$ORIGIN` linker setting lets the executable find it there. Zenity supplies the load/save dialogs. The downloaded dependencies live in the Git-ignored `bin/` directory, so download them again on a fresh clone. Rebuild the executable after changing its C source, or rebuild `libgenerator.so` after changing Go source.
-
-If Neovim's clangd cannot find Clay, make sure `.clangd` includes `-Ibin/native-deps` under `CompileFlags.Add`, then run `:LspRestart`. The actual compiler also needs that include flag, as shown above.
-
-Both frontends display a generating message before calling the Go initializer synchronously; input and rendering pause until generation finishes. Neither frontend creates a worker thread for generation.
+If you're using neovim, and its clangd cannot find Clay, make sure `.clangd` includes `-Ibin/native-deps` under `CompileFlags.Add`, then run `:LspRestart`. The actual compiler also needs that include flag, as shown above.
 
 ### Playing
 
