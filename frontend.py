@@ -171,7 +171,6 @@ def main():
 			for button in self.buttons:
 				button.config(state="disabled")
 			self.draw()
-			# Present "Generating…" before blocking on the native initializer.
 			self.root.update_idletasks()
 			try:
 				board = GameState()
